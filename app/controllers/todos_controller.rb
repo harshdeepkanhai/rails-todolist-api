@@ -56,7 +56,8 @@ class TodosController < ApplicationController
     end
 
     def require_authorization
-      if request.headers.fetch("Authorization").split(" ").last == "api_key2"
+      key = request.headers.fetch("Authorization").split(" ").last
+      if  key != "api_key2"
         render json: { message: "Invalid API key" }, status: :unauthorized
       end
     end
