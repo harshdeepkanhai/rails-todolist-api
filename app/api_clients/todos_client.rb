@@ -68,8 +68,6 @@ class TodosClient
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.instance_of?(URI::HTTPS)
 
-    # GET "/todos"
-
     request = klass.new(uri.request_uri, {
       "Authorization" => "Bearer #{token}",
       "Accept" => "application/json"
