@@ -1,4 +1,5 @@
 class TodosController < ApplicationController
+  before_action :require_authorization
   before_action :set_todo, only: %i[ show edit update destroy ]
 
   # GET /todos or /todos.json
@@ -10,26 +11,15 @@ class TodosController < ApplicationController
   def show
   end
 
-  # GET /todos/new
-  def new
-    @todo = Todo.new
-  end
-
-  # GET /todos/1/edit
-  def edit
-  end
-
   # POST /todos or /todos.json
   def create
     @todo = Todo.new(todo_params)
 
     respond_to do |format|
       if @todo.save
-        format.html { redirect_to @todo, notice: "Todo was successfully created." }
-        format.json { render :show, status: :created, location: @todo }
+        render :show, status: :created, location: @todo
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @todo.errors, status: :unprocessable_entity }
+        render json: @todo.errors, status: :unprocessable_entity
       end
     end
   end
@@ -38,11 +28,9 @@ class TodosController < ApplicationController
   def update
     respond_to do |format|
       if @todo.update(todo_params)
-        format.html { redirect_to @todo, notice: "Todo was successfully updated." }
-        format.json { render :show, status: :ok, location: @todo }
+        render :show, status: :ok, location: @todo
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @todo.errors, status: :unprocessable_entity }
+        render json: @todo.errors, status: :unprocessable_entity
       end
     end
   end
@@ -52,8 +40,7 @@ class TodosController < ApplicationController
     @todo.destroy!
 
     respond_to do |format|
-      format.html { redirect_to todos_path, status: :see_other, notice: "Todo was successfully destroyed." }
-      format.json { head :no_content }
+      head :no_content
     end
   end
 
@@ -66,5 +53,11 @@ class TodosController < ApplicationController
     # Only allow a list of trusted parameters through.
     def todo_params
       params.expect(todo: [ :description ])
+    end
+
+    def require_authorization
+      if request.headers.fetch("Authorization").split(" ").last == "api_key2"
+        render json: { message: "Invalid API key" }, status: :unauthorized
+      end
     end
 end
