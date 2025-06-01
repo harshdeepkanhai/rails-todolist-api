@@ -1,4 +1,5 @@
 class TodosController < ApplicationController
+  skip_before_action :verify_authenticity_token
   before_action :require_authorization
   before_action :set_todo, only: %i[ show edit update destroy ]
 
@@ -15,33 +16,26 @@ class TodosController < ApplicationController
   def create
     @todo = Todo.new(todo_params)
 
-    respond_to do |format|
-      if @todo.save
-        render :show, status: :created, location: @todo
-      else
-        render json: @todo.errors, status: :unprocessable_entity
-      end
+    if @todo.save
+      render :show, status: :created, location: @todo
+    else
+      render json: @todo.errors, status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /todos/1 or /todos/1.json
   def update
-    respond_to do |format|
-      if @todo.update(todo_params)
-        render :show, status: :ok, location: @todo
-      else
-        render json: @todo.errors, status: :unprocessable_entity
-      end
+    if @todo.update(todo_params)
+      render :show, status: :ok, location: @todo
+    else
+      render json: @todo.errors, status: :unprocessable_entity
     end
   end
 
   # DELETE /todos/1 or /todos/1.json
   def destroy
     @todo.destroy!
-
-    respond_to do |format|
-      head :no_content
-    end
+    head :no_content
   end
 
   private
